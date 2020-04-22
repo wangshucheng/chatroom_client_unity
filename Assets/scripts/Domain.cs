@@ -4,19 +4,38 @@ using UnityEngine;
 
 public class Domain : MonoBehaviour {
 
-    public string ip = "172.0.0.1";
-    public int port = 8086;
+    public string ip = "127.0.0.1";
+    public int port = 1238;
+
+    public bool isAsync = true;
+
+    SocketClient sc;
 
     // Use this for initialization
     void Start () {
-        SocketClient sc = new SocketClient();
-        sc.Connect(ip, port);
-        sc.Send("hello");
+        sc = new SocketClient();
+        if (isAsync)
+            StartCoroutine(sc.Connect(ip, port));
+        else
+            sc.ConnectAsync(ip, port);
+        //sc.Send("hello");
 
     }
-	
+
+    float time = 0;
+    float times = 0;
+
 	// Update is called once per frame
 	void Update () {
-		
+		if (!isAsync && times < 10)
+        {
+            time += Time.deltaTime;
+            if (time>2)
+            {
+                sc.Send("hello");
+                time -= 2;
+                times++;
+            }
+        }
 	}
 }
